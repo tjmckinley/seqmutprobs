@@ -13,9 +13,9 @@ gen_exact_norm<-function(seqdata,pstar,lpriorPA,mc.cores=1, ...)
 	lnorms<-mclapply(seqdata1,function(seqs,nsamp,pstar,ntotcol,lpriors)
 	{
 		#generate (10 x ncol)-matrix of intermediate values for calculating PPAs
-		lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)))$lPDM_int_mat
+		lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)), PACKAGE = "seqmutprobs")$lPDM_int_mat
 		#now generate normalising constants
-		lnorms<-apply(lpriors,1,function(x,nsamp,ntotcol,lPDM_int_mat) lnorm<-.Call("genmodels_exact",nsamp,ntotcol,x,lPDM_int_mat),nsamp=nsamp,ntotcol=ntotcol,lPDM_int_mat=lPDM_int_mat)
+		lnorms<-apply(lpriors,1,function(x,nsamp,ntotcol,lPDM_int_mat) lnorm<-.Call("genmodels_exact",nsamp,ntotcol,x,lPDM_int_mat, PACKAGE = "seqmutprobs"),nsamp=nsamp,ntotcol=ntotcol,lPDM_int_mat=lPDM_int_mat)
 		lnorms
 	},nsamp=nsamp,pstar=pstar,ntotcol=ntotcol,lpriors=lpriorPA,mc.cores=mc.cores)
 	lnorms<-do.call("cbind",lapply(lnorms,as.numeric))

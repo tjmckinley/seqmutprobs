@@ -5,8 +5,40 @@ Version: 1.0
 Date: 2012-03-06
 Author: TJ McKinley
 Maintainer: TJ McKinley <tjm44@cam.ac.uk>
-Description: This package compares sets of genetic sequences and screens for nucleotide sites-of-interest, based on the methods developed in McKinley et al., PLoS Comp. Biol. (2011) and McKinley et al. (2012), in preparation.
-Depends: seqinr (<= 3.5-0), Rsamtools, Rmpfr, multicore
+Description: This package compares sets of genetic sequences and screens for
+    nucleotide sites-of-interest, based on the methods developed in McKinley et
+    al., PLoS Comp. Biol. (2011) and McKinley et al. (2012), in preparation.
+Depends:
+    seqinr (<= 3.5-0),
+    Rsamtools,
+    Rmpfr,
+    multicore
 SystemRequirements: samtools, Perl
 License: GPL-2
 LazyLoad: yes
+Collate:
+    'calc_basedist.R'
+    'calc_cons.R'
+    'convert_align_pile.R'
+    'create_pileup.R'
+    'entropy.R'
+    'extract_site_info.R'
+    'gen_exact_norm.R'
+    'mutPPAs_top.R'
+    'mutlPDMs_full.R'
+    'num_to_char.R'
+    'plot_mutPPAs.R'
+    'plot_mutPPAs_list.R'
+    'plot_summary_mutPPAs.R'
+    'plot_summary_mutPPAs_list.R'
+    'print_mutPPAs.R'
+    'print_mutPPAs_list.R'
+    'print_summary_mutPPAs.R'
+    'print_summary_mutPPAs_list.R'
+    'seqtoPPAs.R'
+    'seqtoPPAs_default.R'
+    'subset_mutPPAs.R'
+    'summary_mutPPAS_list.R'
+    'summary_mutPPAs.R'
+    'mutPPAs_full.R'
+    'seqmutprobs-package.R'

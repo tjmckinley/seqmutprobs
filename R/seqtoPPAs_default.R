@@ -1,3 +1,9 @@
+#' @return \code{NULL}
+#'
+#' @rdname seqtoPPAs
+#' @method seqtoPPAs default
+#' @S3method seqtoPPAs default
+
 #function that will take sequences directly and output "mutPPAs" object
 seqtoPPAs.default<-function(filenames,ref_file,format=c("fasta","clustal","phylip","mase","msf","bam","pileup"),ref_format=c("fasta","clustal","phylip","mase","msf"),estimate=c("top","full"),criteria=c("both","stringent","less"),supp_output=TRUE,priorPA=c(0.001,0.01,0.05),c=20,samp_names=NULL,pstar=NULL,sites=NA,genes=NA,cov_thresh=5,nswitch_to_supp_output=5, mc.cores=1, ...)
 {
@@ -356,7 +362,6 @@ seqtoPPAs.default<-function(filenames,ref_file,format=c("fasta","clustal","phyli
 									prec<-60
 									while(length(which(!is.finite(log(norm))))>0 & prec<=240)
 									{
-										require(Rmpfr)
 										prec<-prec*2
 										norm<-exp(mpfr(ppas$lPPA,prec))
 										if(length(which(!is.finite(log(norm))))==0)
@@ -471,7 +476,6 @@ seqtoPPAs.default<-function(filenames,ref_file,format=c("fasta","clustal","phyli
 									prec<-60
 									while(length(which(!is.finite(log(norm))))>0 & prec<=240)
 									{
-										require(Rmpfr)
 										prec<-prec*2
 										norm<-exp(mpfr(ppas[[i]][[j]][[k]]$lPPA,prec))
 										if(length(which(!is.finite(log(norm))))==0)

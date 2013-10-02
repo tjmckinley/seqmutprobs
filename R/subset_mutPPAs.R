@@ -1,3 +1,14 @@
+#' Subset method for "mutPPAs" objects
+#' 
+#' Subset method for "mutPPAs" objects
+#' 
+#' @param x mutPPAs object
+#' @param i a scalar indicating the nucleotide site to summarise
+#' @param ... ignored
+#' @rdname subset.mutPPAs
+#' @method [ mutPPAs
+#' @export [.mutPPAs
+
 #subset method for "mutPPAs" objects
 "[.mutPPAs"<-function(x,i)
 {	

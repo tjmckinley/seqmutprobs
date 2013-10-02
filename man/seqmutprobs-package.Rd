@@ -1,30 +1,35 @@
-\name{seqmutprobs-package}
-\alias{seqmutprobs-package}
-\alias{seqmutprobs}
 \docType{package}
+\name{seqmutprobs-package}
+\alias{seqmutprobs}
+\alias{seqmutprobs-package}
 \title{Screens sequence data for sites-of-interest}
-\description{This package compares sets of genetic sequences and screens for nucleotide sites-of-interest, based on the methods developed in McKinley et al., PLoS Comp. Biol. (2011) and McKinley et al. (2012), in preparation.}
+\description{
+  This package compares sets of genetic sequences and
+  screens for nucleotide sites-of-interest, based on the
+  methods developed in McKinley et al., PLoS Comp. Biol.
+  (2011) and McKinley et al. (2012), in preparation.
+}
 \details{
-\tabular{ll}{
-Package: \tab seqmutprobs\cr
-Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2012-01-19\cr
-License: \tab GPL-2\cr
-LazyLoad: \tab yes\cr
+  \tabular{ll}{ Package: \tab seqmutprobs\cr Type: \tab
+  Package\cr Version: \tab 1.0\cr Date: \tab 2012-01-19\cr
+  License: \tab GPL-2\cr LazyLoad: \tab yes\cr } This
+  package takes sets of ordered alignments corresponding to
+  different biological samples, and screens each nucleotide
+  site for evidence of changes in the background
+  distribution of bases over the set of samples, using the
+  methods and screening criteria developed in McKinley et
+  al., PLoS Comp. Biol., (2011) and McKinley et al. (2012),
+  in preparation. Posterior probabilities of association
+  (PPAs) can be generated using the \code{seqtoPPAs}
+  function. The ordered alignments can be stored in various
+  formats (e.g. fasta, mase, phylip, clustal, msf or bam).
+  These are read in using either the \code{read.alignment}
+  function found in the \code{seqinr} package, or the
+  \code{Rsamtools} package functionality dependent on the
+  type of data being used. The PPAs are then stored in a
+  parsimonious format, from which various detailed
+  summaries of the output can be extracted.
 }
-This package takes sets of ordered alignments corresponding to different biological samples, and screens each nucleotide site for evidence of changes in the background distribution of bases over the set of samples, using the methods and screening criteria developed in McKinley et al., PLoS Comp. Biol., (2011) and McKinley et al. (2012), in preparation. Posterior probabilities of association (PPAs) can be generated using the \code{seqtoPPAs} function. The ordered alignments can be stored in various formats (e.g. fasta, mase, phylip, clustal, msf or bam). These are read in using either the \code{read.alignment} function found in the \code{seqinr} package, or the \code{Rsamtools} package functionality dependent on the type of data being used. The PPAs are then stored in a parsimonious format, from which various detailed summaries of the output can be extracted.
-}
-\author{
-TJ McKinley
-
-Maintainer: TJ McKinley <tjm44@cam.ac.uk>
-}
-\references{McKinley et al., PLoS Comp. Biol., 7 (3), e1002027, (2011). doi: 10.1371/journal.pcbi.1002027.
-McKinley et al. (2012), in preparation.}
-\keyword{ package }
-\seealso{\code{seqinr}, \code{Rsamtools}}
-%\seealso{\code{\link[seqinr:seqinr-package]{seqinr}}}
 \examples{
 ##read in data from fasta files
 stock <- system.file("extdata/stock.fasta",
@@ -38,7 +43,7 @@ ref <- system.file("extdata/reference.fasta",
 package = "seqmutprobs")
 
 ##combine into ordered list of 'alignment' objects
-hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2, 
+hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2,
 R01093seqW4 = R01093seqW4)
 
 ##screen for sites-of-interest based on extracting subset of 'top' models
@@ -51,3 +56,18 @@ hiv_muts
 extract_site_info(hiv_muts, 945, "less")
 extract_site_info(hiv_muts, 945, "stringent")
 }
+\author{
+  TJ McKinley
+
+  Maintainer: TJ McKinley <tjm44@cam.ac.uk>
+}
+\references{
+  McKinley et al., PLoS Comp. Biol., 7 (3), e1002027,
+  (2011). doi: 10.1371/journal.pcbi.1002027. McKinley et
+  al. (2012), in preparation.
+}
+\seealso{
+  \code{seqinr}, \code{Rsamtools}
+}
+\keyword{package}
+

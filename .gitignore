@@ -3,3 +3,4 @@
 
 #ignore shared object files
 *.so
+*.o

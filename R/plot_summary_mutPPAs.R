@@ -1,4 +1,57 @@
 #plot method for "summary.mutPPAs" objects
+
+
+#' Plots posterior probabilities of association against entropy for those
+#' sites-of-interest obtained from call to \code{\link{summary.mutPPAs}}
+#' 
+#' \code{plot} method for class \code{"summary.mutPPAs"}
+#' 
+#' Plots posterior probabilities of association against relative entropy for
+#' sites-of-interest as obtained from a call to \code{summary.mutPPAs}. If
+#' plotting to on-screen devices (such as \code{X11} and \code{quartz}
+#' devices), then it attempts to set an optimum plot width and height for
+#' visualisation, else this must be set manually.
+#' 
+#' @param x a \code{"summary.mutPPAs"} object.
+#' @param prior a scalar used to select which results to plot according to the
+#' prior probability of association. If \code{NULL} then defaults to the
+#' smallest prior PA.
+#' @param entropy a character corresponding to whether to plot the "max" or
+#' "mean" of the absolute relative entropy values.
+#' @param \dots not used.
+#' @author TJ McKinley
+#' @seealso \code{\link{seqtoPPAs}}, \code{\link{print.mutPPAs}},
+#' \code{\link{print.mutPPAs.list}}, \code{\link{print.summary.mutPPAs}},
+#' \code{\link{summary.mutPPAs}}
+#' @references McKinley et al., PLoS Comp. Biol., 7 (3), e1002027, (2011). doi:
+#' 10.1371/journal.pcbi.1002027
+#' @examples
+#' 
+#' ##read in data from fasta files
+#' stock <- system.file("extdata/stock.fasta",
+#' package = "seqmutprobs")
+#' R01093seqW2 <- system.file("extdata/R01093seqW2.fasta",
+#' package = "seqmutprobs")
+#' R01093seqW4 <- system.file("extdata/R01093seqW4.fasta",
+#' package = "seqmutprobs")
+#' 
+#' ref <- system.file("extdata/reference.fasta",
+#' package = "seqmutprobs")
+#' 
+#' ##combine into ordered list of 'alignment' objects
+#' hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2, 
+#' R01093seqW4 = R01093seqW4)
+#' 
+#' ##screen for sites-of-interest based on extracting subset of 'top' models
+#' ##and suppressing the return of model outputs for individual sites
+#' hiv_muts <- seqtoPPAs(hiv_filenames, ref)
+#' 
+#' ##plot distributions
+#' plot(summary(hiv_muts))
+#' 
+#' @method plot summary.mutPPAs
+#' @export plot.summary.mutPPAs
+
 plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), ...)
 {
 	if(class(x)!="summary.mutPPAs") stop("'x' is not a 'summary.mutPPAs' object")

@@ -1,5 +1,70 @@
 #function to extract and print models relating to specific nucleotides
 #to be run on "mutPPAs.list" objects
+
+
+#' Extract model summaries
+#' 
+#' Extracts summary information for the base distributions and the best
+#' supported models from \code{"mutPPAs"} object.
+#' 
+#' If the \code{"mutPPAs"} object has been generated using the options
+#' \code{output="full"} or \code{output="top"}, then this function displays
+#' results already saved in the \code{"mutPPAs"} object. If the object was
+#' produced using \code{output="none"}, then this function applies the
+#' efficient search algorithm defined in McKinley et al. (2012) to select and
+#' display for all models with PPAs where the ratio of the candidate model to
+#' the `best' model is less than \code{c} for the specified site.
+#' 
+#' @param object an object of class \code{"mutPPAs"}.
+#' @param site a positive integer corresponding to nucleotide site of interest.
+#' @param criteria a character describing the name of the screening criterion
+#' to extract from an object of class \code{"mutPPAs"}.
+#' @param num_mod a positive integer corresponding to the number of models to
+#' print to the screen.
+#' @param digits a positive integer controlling how output is rounded.
+#' @param c a scalar quantity specifying how the `top' model sets are selected
+#' (see \code{"Details"}).
+#' @param draw a logical specifying whether a plot of the distributions is to
+#' be drawn.
+#' @param ...  not used.
+#' @return Returns the distributions of bases across all the samples for a
+#' given site along the gene segment, and also returns summary information for
+#' the \code{num_mod} models best supported by the data.
+#' @author TJ McKinley
+#' @seealso \code{\link{seqtoPPAs}}
+#' @references McKinley et al., PLoS Comp. Biol., 7 (3), e1002027, (2011). doi:
+#' 10.1371/journal.pcbi.1002027
+#' @examples
+#' 
+#' ##read in data from fasta files
+#' stock <- system.file("extdata/stock.fasta",
+#' package = "seqmutprobs")
+#' R01093seqW2 <- system.file("extdata/R01093seqW2.fasta",
+#' package = "seqmutprobs")
+#' R01093seqW4 <- system.file("extdata/R01093seqW4.fasta",
+#' package = "seqmutprobs")
+#' 
+#' ref <- system.file("extdata/reference.fasta",
+#' package = "seqmutprobs")
+#' 
+#' ##combine into ordered list of 'alignment' objects
+#' hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2, 
+#' R01093seqW4 = R01093seqW4)
+#' 
+#' ##screen for sites-of-interest based on extracting subset of 'top' models
+#' ##and suppressing the return of model outputs for individual sites
+#' hiv_muts <- seqtoPPAs(hiv_filenames, ref)
+#' 
+#' ##extract base distributions and top 5 models at site 945, for both
+#' ##stringent and less stringent screening criteria
+#' extract_site_info(hiv_muts, 945, "less")
+#' extract_site_info(hiv_muts, 945, "stringent")
+#' 
+#' ##plot distributions for site 945
+#' extract_site_info(hiv_muts, 945, draw = TRUE)
+#' 
+#' @export extract_site_info
+
 extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5,digits=2,c=20,draw=FALSE, ...)
 {
 	#check that inputs are in correct format
@@ -176,7 +241,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 						priorPA<-object$priorPA
 
 						#produce prior specifications by generating (but not recording) each potential model sequentially
-						structure<-.Call("genmodels_priors",nsamp)
+						structure<-.Call("genmodels_priors",nsamp, PACKAGE = "seqmutprobs")
 						nstructure<-length(structure)
 						totmods<-structure[nstructure-2]
 						nalt_ls<-structure[nstructure-1]
@@ -204,7 +269,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 						PPA_mat<-apply(seqdata,2,function(seqs,nsamp,pstar,ntotcol,logc,lpriors,structure,criteria)
 						{
 							#generate (10 x ncol)-matrix of intermediate values for calculating PPAs
-							lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)))$lPDM_int_mat
+							lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)), PACKAGE = "seqmutprobs")$lPDM_int_mat
 							lPPAs<-apply(lpriors,1,function(x,seqs,nsamp,pstar,ntotcol,logc,structure,criteria,lPDM_int_mat)
 							{
 								#sort out and remove duplicates in 'lPDM_int_mat'
@@ -234,7 +299,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 								if(criteria=="both"|criteria=="less")
 								{
 									#now calculate PPAs according to approximation routine for LESS-STRINGENT criteria
-									lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat1,0,structure,length(structure)/nsamp,1,uni,uni_ind)
+									lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat1,0,structure,length(structure)/nsamp,1,uni,uni_ind, PACKAGE = "seqmutprobs")
 									totmods<-lPPA_mat_ls[length(lPPA_mat_ls)]
 									lPPA_mat_ls<-lPPA_mat_ls[1:(length(lPPA_mat_ls)-1)]
 									models_num<-lPPA_mat_ls[1:(2*nsamp*totmods)]
@@ -249,7 +314,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 								if(criteria=="both"|criteria=="stringent")
 								{
 									#now calculate PPAs according to approximation routine for LESS-STRINGENT criteria
-									lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat1,1,structure,length(structure)/nsamp,1,uni,uni_ind)
+									lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat1,1,structure,length(structure)/nsamp,1,uni,uni_ind, PACKAGE = "seqmutprobs")
 									totmods<-lPPA_mat_s[length(lPPA_mat_s)]
 									lPPA_mat_s<-lPPA_mat_s[1:(length(lPPA_mat_s)-1)]
 									models_num<-lPPA_mat_s[1:(2*nsamp*totmods)]
@@ -294,7 +359,6 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 											prec<-60
 											while(length(which(!is.finite(log(norm))))>0 & prec<=240)
 											{
-												require(Rmpfr)
 												prec<-prec*2
 												norm<-exp(mpfr(ppas[[crit]]$lPPA,prec))
 												if(length(which(!is.finite(log(norm))))==0)
@@ -379,7 +443,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 						priorPA<-object$priorPA
 
 						#produce prior specifications by generating (but not recording) each potential model sequentially
-						structure<-.Call("genmodels_priors",nsamp)
+						structure<-.Call("genmodels_priors",nsamp, PACKAGE = "seqmutprobs")
 						nstructure<-length(structure)
 						totmods<-structure[nstructure-2]
 						nalt_ls<-structure[nstructure-1]
@@ -407,7 +471,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 						PPA_mat<-apply(seqdata,2,function(seqs,nsamp,pstar,ntotcol,logc,lpriors,structure,criteria)
 						{
 							#generate (10 x ncol)-matrix of intermediate values for calculating PPAs
-							lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)))$lPDM_int_mat
+							lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)), PACKAGE = "seqmutprobs")$lPDM_int_mat
 							lPPAs<-apply(lpriors,1,function(x,seqs,nsamp,pstar,ntotcol,logc,structure,criteria,lPDM_int_mat)
 							{
 								#sort out and remove duplicates in 'lPDM_int_mat'
@@ -437,7 +501,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 								if(criteria=="both"|criteria=="less")
 								{
 									#now calculate PPAs according to approximation routine for LESS-STRINGENT criteria
-									lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat1,0,structure,length(structure)/nsamp,1,uni,uni_ind)
+									lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat1,0,structure,length(structure)/nsamp,1,uni,uni_ind, PACKAGE = "seqmutprobs")
 									totmods<-lPPA_mat_ls[length(lPPA_mat_ls)]
 									lPPA_mat_ls<-lPPA_mat_ls[1:(length(lPPA_mat_ls)-1)]
 									models_num<-lPPA_mat_ls[1:(2*nsamp*totmods)]
@@ -452,7 +516,7 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 								if(criteria=="both"|criteria=="stringent")
 								{
 									#now calculate PPAs according to approximation routine for LESS-STRINGENT criteria
-									lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat1,1,structure,length(structure)/nsamp,1,uni,uni_ind)
+									lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat1,1,structure,length(structure)/nsamp,1,uni,uni_ind, PACKAGE = "seqmutprobs")
 									totmods<-lPPA_mat_s[length(lPPA_mat_s)]
 									lPPA_mat_s<-lPPA_mat_s[1:(length(lPPA_mat_s)-1)]
 									models_num<-lPPA_mat_s[1:(2*nsamp*totmods)]
@@ -497,7 +561,6 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 											prec<-60
 											while(length(which(!is.finite(log(norm))))>0 & prec<=240)
 											{
-												require(Rmpfr)
 												prec<-prec*2
 												norm<-exp(mpfr(ppas[[crit]]$lPPA,prec))
 												if(length(which(!is.finite(log(norm))))==0)

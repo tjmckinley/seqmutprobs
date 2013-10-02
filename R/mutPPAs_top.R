@@ -18,7 +18,7 @@ mutPPAs_top<-function(seqdata,c=20,priorPA=c(0.001,0.05,0.01),criteria=c("both",
 	seqdata<-seqdata$seqdata
 		
 	#produce prior specifications by generating (but not recording) each potential model sequentially
-	structure<-.Call("genmodels_priors",nsamp)
+	structure<-.Call("genmodels_priors",nsamp, PACKAGE = "seqmutprobs")
 	nstructure<-length(structure)
 	totmods<-structure[nstructure-2]
 	nalt_ls<-structure[nstructure-1]
@@ -51,7 +51,7 @@ mutPPAs_top<-function(seqdata,c=20,priorPA=c(0.001,0.05,0.01),criteria=c("both",
 		PPA_mat<-mclapply(seqdata1,function(seqs,nsamp,pstar,ntotcol,logc,lpriors,structure,criteria,priorPA,ppas)
 		{
 			#generate (10 x ncol)-matrix of intermediate values for calculating PPAs
-			lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)))$lPDM_int_mat
+			lPDM_int_mat<-.C("calc_lPDM_int_fn",as.integer(nsamp),as.integer(seqs),as.double(pstar),lPDM_int_mat=as.double(numeric(10*ntotcol)), PACKAGE = "seqmutprobs")$lPDM_int_mat
 			lPPAs<-apply(lpriors,1,function(x,seqs,nsamp,pstar,ntotcol,logc,structure,criteria,lPDM_int_mat,ppas)
 			{
 				#sort out and remove duplicates in 'lPDM_int_mat'
@@ -82,8 +82,8 @@ mutPPAs_top<-function(seqdata,c=20,priorPA=c(0.001,0.05,0.01),criteria=c("both",
 				if(criteria=="both"|criteria=="less")
 				{
 					#now calculate PPAs according to approximation routine for LESS-STRINGENT criteria
-					if(ppas==TRUE) lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat1,0,structure,length(structure)/nsamp,1,uni,uni_ind)
-					else lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat,0,structure,length(structure)/nsamp,0,uni,uni_ind)
+					if(ppas==TRUE) lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat1,0,structure,length(structure)/nsamp,1,uni,uni_ind, PACKAGE = "seqmutprobs")
+					else lPPA_mat_ls<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[1],x[2],lPDM_int_mat,0,structure,length(structure)/nsamp,0,uni,uni_ind, PACKAGE = "seqmutprobs")
 					totmods<-lPPA_mat_ls[length(lPPA_mat_ls)]
 					lPPA_mat_ls<-lPPA_mat_ls[1:(length(lPPA_mat_ls)-1)]
 					models_num<-lPPA_mat_ls[1:(2*nsamp*totmods)]
@@ -104,7 +104,6 @@ mutPPAs_top<-function(seqdata,c=20,priorPA=c(0.001,0.05,0.01),criteria=c("both",
 							prec<-60
 							while(length(which(!is.finite(log(norm))))>0 & prec<=240)
 							{
-								require(Rmpfr)
 								prec<-prec*2
 								norm<-exp(mpfr(lPPA_mat_ls,prec))
 								if(length(which(!is.finite(log(norm))))==0)
@@ -146,8 +145,8 @@ mutPPAs_top<-function(seqdata,c=20,priorPA=c(0.001,0.05,0.01),criteria=c("both",
 				if(criteria=="both"|criteria=="stringent")
 				{
 					#now calculate PPAs according to approximation routine for LESS-STRINGENT criteria
-					if(ppas==TRUE) lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat1,1,structure,length(structure)/nsamp,1,uni,uni_ind)
-					else lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat,1,structure,length(structure)/nsamp,0,uni,uni_ind)
+					if(ppas==TRUE) lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat1,1,structure,length(structure)/nsamp,1,uni,uni_ind, PACKAGE = "seqmutprobs")
+					else lPPA_mat_s<-.Call("calc_PPAs_approx_fn",nsamp,ntotcol,logc,x[3],x[4],lPDM_int_mat,1,structure,length(structure)/nsamp,0,uni,uni_ind, PACKAGE = "seqmutprobs")
 					totmods<-lPPA_mat_s[length(lPPA_mat_s)]
 					lPPA_mat_s<-lPPA_mat_s[1:(length(lPPA_mat_s)-1)]
 					models_num<-lPPA_mat_s[1:(2*nsamp*totmods)]
@@ -168,7 +167,6 @@ mutPPAs_top<-function(seqdata,c=20,priorPA=c(0.001,0.05,0.01),criteria=c("both",
 							prec<-60
 							while(length(which(!is.finite(log(norm))))>0 & prec<=240)
 							{
-								require(Rmpfr)
 								prec<-prec*2
 								norm<-exp(mpfr(lPPA_mat_s,prec))
 								if(length(which(!is.finite(log(norm))))==0)
