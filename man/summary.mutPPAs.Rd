@@ -52,11 +52,13 @@ from call to \code{\link{seqtoPPAs}}}
   between the first sample and each of the subsequent
   samples, as well as the arithmetic mean of these entropy
   measures. The normalisation factor is estimated
-  numerically.} \item{hyp_output}{a character vector used
-  for printing.} \item{hyp_names}{a character vector used
-  for printing.} \item{hyp_id}{a vector recording which
-  criteria contain sites-of-interest.} \item{thresh}{a
-  scalar recording the threshold applied to the PPAs.} }
+  numerically.} \item{shannon}{a matrix containing values
+  for the normalised Shannon entropy.} \item{hyp_output}{a
+  character vector used for printing.} \item{hyp_names}{a
+  character vector used for printing.} \item{hyp_id}{a
+  vector recording which criteria contain
+  sites-of-interest.} \item{thresh}{a scalar recording the
+  threshold applied to the PPAs.} }
 }
 \description{
   \code{summary} method for class \code{"mutPPAs"}

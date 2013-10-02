@@ -123,8 +123,37 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), ...)
 		entropy1<-x$entropy[!is.na(sites1[,j]),entcol]
 		sites2<-sites1[!is.na(sites1[,j]),]
 		if(!is.matrix(sites2)) sites2<-matrix(sites2,nrow=1)
-		plot(entropy1,sites2[,j],bg=cols1,pch=pchs1,ylab=paste("PPA (prior PA=",prior1,")",sep=""),xlab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"entropy"),main=paste(colnames(sites2)[j]),ylim=c(ymin,ymax),xlim=c(xmin,xmax))
+		plot(entropy1,sites2[,j],bg=cols1,pch=pchs1,ylab=paste("PPA (prior PA=",prior1,")",sep=""),xlab=paste(ifelse(entropy[1]=="max","Max.","Mean")," K-L entropy"),main=paste(colnames(sites2)[j]),ylim=c(ymin,ymax),xlim=c(xmin,xmax))
 	}
+	legend(par("usr")[2]*1.05,mean(par("usr")[3:4]),legend=sites1[,1],pch=pchs,pt.bg=cols,xpd=NA,yjust=0.5,ncol=ncol.legend)
+	mtext(text=paste(x$genes),side=3,font=2,cex=1.5,outer=T)
+	
+	#plot entropy vs Shannon entropy
+	
+	ymin<-unlist(x$entropy[,entcol])
+	ymin<-xmin[!is.na(xmin)]
+	ymax<-max(xmin)
+	ymin<-min(xmin)
+	xmin<-unlist(x$shannon[,entcol])
+	xmin<-xmin[!is.na(xmin)]
+	xmax<-max(xmin)
+	xmin<-min(xmin)
+	
+	#open new graphics device and set parameters
+	if(dev.cur()==1) dev<-0
+	else
+	{
+		dev<-names(dev.cur())
+		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
+		else dev<-1
+	}
+	if(dev==0) dev.new(width=7+0.5*ncol.legend,height=7)
+	par(mfrow=c(1,1),oma=c(0,0,2,4*ncol.legend))
+	cols1<-cols[!is.na(sites1[,j])]
+	pchs1<-pchs[!is.na(sites1[,j])]
+	shannon1<-x$shannon[!is.na(sites1[,j]),entcol]
+	entropy1<-x$entropy[!is.na(sites1[,j]),entcol]
+	plot(shannon1,entropy1,bg=cols1,pch=pchs1,ylab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"K-L entropy"),xlab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"Shannon entropy"),ylim=c(ymin,ymax),xlim=c(xmin,xmax))
 	legend(par("usr")[2]*1.05,mean(par("usr")[3:4]),legend=sites1[,1],pch=pchs,pt.bg=cols,xpd=NA,yjust=0.5,ncol=ncol.legend)
 	mtext(text=paste(x$genes),side=3,font=2,cex=1.5,outer=T)
 }

@@ -99,66 +99,66 @@
   A list where each element contains an object of class
   \code{mutPPAs.list} corresponding to each gene, these are
   basically lists including elements: \itemize{
-  \item{nseq}{if the input alignments are from capillary
+  \item{nseq:}{ if the input alignments are from capillary
   sequencing, then this is a vector the same length as
   \code{seqdata} containing the number of sequences in each
   sample. If the alignments are from NGS data, then this is
   a list where each element of the list contains the
   maximum and minimum coverage counts across the gene
-  segment of interest.} \item{nnuc}{a scalar containing the
-  total number of nucleotide sites in each gene segment.}
-  \item{pstar}{a scalar containing the value of p*.}
-  \item{samp_names}{a character vector the same length as
-  \code{seqdata} containing the names of each sample.}
-  \item{basedist}{a matrix of containing base distributions
-  for each unique site.} \item{nucind}{a vector of length
-  \code{nnuc} specifying which column of \code{basedist}
-  corresponds to each nucleotide site.} \item{cons}{a
-  character vector of length \code{nnuc} containing the
-  consensus sequence.} \item{rem_sites}{a numeric vector
-  containing the locations of any sites removed from the
-  analysis.} \item{test_sites}{a numeric vector containing
-  the locations of the subset of sites tested (if missing
-  then all sites tested).} \item{priorPA}{a numeric vector
-  corresponding to the prior probabilities of association.}
-  \item{PPAs}{a list of length 5. If \code{output="full"}
-  then the element \code{models_num} is a single matrix,
-  and \code{hyps} is a list of length 2, where each element
-  corresponds to a screening criteria. Otherwise each
-  element described below (with the exception of
-  \code{nprior}) is a nested list with (number of unique
-  sites x length of \code{priorPA} x number of criteria)
-  elements. The forms for each of these final elements is
-  described below:} \item{ "models_num" : the top-level
-  elements contain matrix representations of all possible
-  models for all unique sites. For each model matrix, if
-  \code{nsamp} is the number of samples, then each row
-  corresponds to a model, and the first \code{nsamp}
-  columns correspond to the choice of model for each
-  sample, and the second \code{nsamp} columns correspond to
-  a set of dependency indicators corresponding to whether
-  samples are assumed to be drawn from exactly the same
-  underlying distribution(s) or not. These are converted to
-  a prettier form when printed.} \item{}{ "hyps" : the
-  top-level elements contain binary vectors corresponding
-  to which models in the corresponding element of
-  \code{models_num} are consistent with the null (0) and
-  alternative (1) hypotheses.} \item{}{ "nprior" : a
-  numeric vector of length 3, containing the total number
-  of possible models, and the number of those corresponding
-  to the null and alternative hypotheses.} \item{}{ "PPAs"
-  : the top-level elements contain numeric vectors
-  corresponding to the PPAs for each model in the
-  corresponding element of \code{models_num}.} \item{}{
-  "norms" : the top-level elements are scalars
-  corresponding to the normalising constants for each set
-  of PPAs. (These are missing when
-  \code{estimate="approx"}.)} \item{genes}{a vector of
+  segment of interest.} \item{nnuc:}{ a scalar containing
+  the total number of nucleotide sites in each gene
+  segment.} \item{pstar:}{ a scalar containing the value of
+  p*.} \item{samp_names:}{ a character vector the same
+  length as \code{seqdata} containing the names of each
+  sample.} \item{basedist:}{ a matrix of containing base
+  distributions for each unique site.} \item{nucind:}{ a
+  vector of length \code{nnuc} specifying which column of
+  \code{basedist} corresponds to each nucleotide site.}
+  \item{cons:}{ a character vector of length \code{nnuc}
+  containing the consensus sequence.} \item{rem_sites:}{ a
+  numeric vector containing the locations of any sites
+  removed from the analysis.} \item{test_sites:}{ a numeric
+  vector containing the locations of the subset of sites
+  tested (if missing then all sites tested).}
+  \item{priorPA:}{ a numeric vector corresponding to the
+  prior probabilities of association.} \item{PPAs:}{ a list
+  of length 5. If \code{output="full"} then the element
+  \code{models_num} is a single matrix, and \code{hyps} is
+  a list of length 2, where each element corresponds to a
+  screening criteria. Otherwise each element described
+  below (with the exception of \code{nprior}) is a nested
+  list with (number of unique sites x length of
+  \code{priorPA} x number of criteria) elements. The forms
+  for each of these final elements is described below:}
+  \itemize{ \item{models_num:}{ the top-level elements
+  contain matrix representations of all possible models for
+  all unique sites. For each model matrix, if \code{nsamp}
+  is the number of samples, then each row corresponds to a
+  model, and the first \code{nsamp} columns correspond to
+  the choice of model for each sample, and the second
+  \code{nsamp} columns correspond to a set of dependency
+  indicators corresponding to whether samples are assumed
+  to be drawn from exactly the same underlying
+  distribution(s) or not. These are converted to a prettier
+  form when printed.} \item{hyps:}{ the top-level elements
+  contain binary vectors corresponding to which models in
+  the corresponding element of \code{models_num} are
+  consistent with the null (0) and alternative (1)
+  hypotheses.} \item{nprior:}{ a numeric vector of length
+  3, containing the total number of possible models, and
+  the number of those corresponding to the null and
+  alternative hypotheses.} \item{PPAs:}{ the top-level
+  elements contain numeric vectors corresponding to the
+  PPAs for each model in the corresponding element of
+  \code{models_num}.} \item{norms:}{ the top-level elements
+  are scalars corresponding to the normalising constants
+  for each set of PPAs. (These are missing when
+  \code{estimate="approx"}.)} } \item{genes:}{ a vector of
   characters recording the names of the genes.}
-  \item{estimate}{a character recording the type of
-  estimate produced.} \item{supp_output}{a logical
+  \item{estimate:}{ a character recording the type of
+  estimate produced.} \item{supp_output:}{ a logical
   recording whether the model outputs are suppressed.}
-  \item{hyp_PPAs}{a nested list with (length of
+  \item{hyp_PPAs:}{ a nested list with (length of
   \code{priorPA} x number of criteria x number of unique
   sites) elements, where each top-level element is a scalar
   corresponding to the PPA that the given site is a

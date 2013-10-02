@@ -144,10 +144,18 @@ print.summary.mutPPAs<-function(x, ...)
 			#now print entropy results to the screen
 			cat("\n")
 			x$entropy<-rbind(colnames(x$entropy),x$entropy)
-			x$entropy<-rbind(c("Entropy",rep("",ncol(x$entropy)-1)),x$entropy)
+			x$entropy<-rbind(c("K-L Entropy",rep("",ncol(x$entropy)-1)),x$entropy)
 			x$entropy[is.na(x$entropy)]<-""
 			x$entropy<-cbind(x$sitesofinterest[,1],x$entropy)
 			write.table(format(x$entropy),quote=F,na="",row.names=F,col.names=F)
+			
+			#now print Shannon entropy results to the screen
+			cat("\n")
+			x$shannon<-rbind(colnames(x$shannon),x$shannon)
+			x$shannon<-rbind(c("Shannon entropy",rep("",ncol(x$shannon)-1)),x$shannon)
+			x$shannon[is.na(x$shannon)]<-""
+			x$shannon<-cbind(x$sitesofinterest[,1],x$shannon)
+			write.table(format(x$shannon),quote=F,na="",row.names=F,col.names=F)
 		}
 	}
 	else cat(paste("\nNo nucleotide sites found that have PPAs > ",x$thresh," for EITHER criterion\n",sep=""))

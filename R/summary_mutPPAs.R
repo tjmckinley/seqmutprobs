@@ -44,6 +44,7 @@
 #' are between the first sample and each of the subsequent samples, as well as
 #' the arithmetic mean of these entropy measures. The normalisation factor is
 #' estimated numerically.}
+#' \item{shannon}{a matrix containing values for the normalised Shannon entropy.}
 #' \item{hyp_output}{a character vector used for printing.}
 #' \item{hyp_names}{a character vector used for printing.}
 #' \item{hyp_id}{a vector recording which criteria contain
@@ -201,17 +202,33 @@ summary.mutPPAs<-function(object,thresh=0.5,digits=2, ...)
 		entropy<-cbind(entropy,apply(entropy,1,mean),apply(entropy,1,max))
 		entropy<-round(entropy,digits=digits)
 		colnames(entropy)<-c(paste(2:(ncol(entropy)-1),":1",sep=""),"Mean","Max")
+		
+		#calculate Shannon entropy
+		shannon <- apply(dists, 2, function(x)
+		{
+			dists <- matrix(x, nrow = 4)
+			#calculate Shannon entropy
+			ans <- apply(dists, 2, shannon.fn)
+			ans
+		})
+		if(nrow(dists)>8) shannon<-t(shannon)
+		else shannon<-matrix(shannon,ncol=1)
+		shannon<-cbind(shannon,apply(shannon,1,mean),apply(shannon,1,max))
+		shannon<-round(shannon,digits=digits)
+		colnames(shannon)<-c(as.character(1:(ncol(shannon) - 2)),"Mean","Max")
 	}
 	else
 	{
 		sitesofinterest<-NA
 		hyp_id<-NA
 		entropy<-NA
+		shannon<-NA
 	}
 
 	#remove elements of x that are no longer necessary
 	x$sitesofinterest<-sitesofinterest
 	x$entropy<-entropy
+	x$shannon<-shannon
 	x$hyp_output<-hyp_output
 	x$hyp_names<-hyp_names
 	x$hyp_id<-hyp_id
