@@ -1,5 +1,5 @@
-#functions for calculating normalised K-L entropy
-entropy.fn<-function(z1,z2,...)
+#functions for calculating K-L entropy
+entropy.fn<-function(z1,z2)
 {
 	s1<-sum(z1)
 	s2<-sum(z2)
@@ -7,7 +7,7 @@ entropy.fn<-function(z1,z2,...)
 }
 
 #function for calculating Shannon entropy
-shannon.fn <- function(z1, ...)
+shannon.fn <- function(z1)
 {
 	z1 <- z1 / sum(z1)
 	z1[z1 == 0] <- 1
@@ -15,4 +15,14 @@ shannon.fn <- function(z1, ...)
 	z1 <- -sum(z1)
 	z1
 }
+
+#function for calculating K-L entropy relative to the prior
+klprior.fn <- function(z1)
+{
+	s <- sum(z1)
+	pd <- log(2) - log((s + 1) * (s - z1[4] + 2) * (s - z1[4] + 1))
+	a <- lfactorial(s) - sum(lfactorial(z1))
+	pd + (5 / 2) * (s + z1[4]) - a
+}
+
 

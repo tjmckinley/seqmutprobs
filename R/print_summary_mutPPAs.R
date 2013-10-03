@@ -156,6 +156,14 @@ print.summary.mutPPAs<-function(x, ...)
 			x$shannon[is.na(x$shannon)]<-""
 			x$shannon<-cbind(x$sitesofinterest[,1],x$shannon)
 			write.table(format(x$shannon),quote=F,na="",row.names=F,col.names=F)
+			
+			#now print K-L entropy (relative to the prior) results to the screen
+			cat("\n")
+			x$klprior<-rbind(colnames(x$klprior),x$klprior)
+			x$klprior<-rbind(c("K-L (prior) entropy",rep("",ncol(x$klprior)-1)),x$klprior)
+			x$klprior[is.na(x$klprior)]<-""
+			x$klprior<-cbind(x$sitesofinterest[,1],x$klprior)
+			write.table(format(x$klprior),quote=F,na="",row.names=F,col.names=F)
 		}
 	}
 	else cat(paste("\nNo nucleotide sites found that have PPAs > ",x$thresh," for EITHER criterion\n",sep=""))

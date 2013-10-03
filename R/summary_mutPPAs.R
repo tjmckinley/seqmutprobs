@@ -45,6 +45,7 @@
 #' the arithmetic mean of these entropy measures. The normalisation factor is
 #' estimated numerically.}
 #' \item{shannon}{a matrix containing values for the normalised Shannon entropy.}
+#' \item{klprior}{a matrix containing values for the normalised K-L entropy relative to the prior.}
 #' \item{hyp_output}{a character vector used for printing.}
 #' \item{hyp_names}{a character vector used for printing.}
 #' \item{hyp_id}{a vector recording which criteria contain
@@ -207,8 +208,9 @@ summary.mutPPAs<-function(object,thresh=0.5,digits=2, ...)
 		shannon <- apply(dists, 2, function(x)
 		{
 			dists <- matrix(x, nrow = 4)
-			#calculate Shannon entropy
+			#calculate normalised Shannon entropy
 			ans <- apply(dists, 2, shannon.fn)
+			ans <- ans / (-4 * 0.25 * log(0.25))
 			ans
 		})
 		if(nrow(dists)>8) shannon<-t(shannon)
@@ -216,6 +218,21 @@ summary.mutPPAs<-function(object,thresh=0.5,digits=2, ...)
 		shannon<-cbind(shannon,apply(shannon,1,mean),apply(shannon,1,max))
 		shannon<-round(shannon,digits=digits)
 		colnames(shannon)<-c(as.character(1:(ncol(shannon) - 2)),"Mean","Max")
+		
+		#calculate K-L entropy relative to the prior
+		klprior <- apply(dists, 2, function(x)
+		{
+			dists <- matrix(x, nrow = 4)
+			#calculate K-L entropy
+			ans <- apply(dists, 2, klprior.fn)
+			for(j in 1:length(ans)) ans[j] <- ans[j] / klprior.fn(c(0, 0, 0, sum(dists[, j])))
+			ans
+		})
+		if(nrow(dists)>8) klprior<-t(klprior)
+		else klprior<-matrix(klprior,ncol=1)
+		klprior<-cbind(klprior,apply(klprior,1,mean),apply(klprior,1,max))
+		klprior<-round(klprior,digits=digits)
+		colnames(klprior)<-c(as.character(1:(ncol(klprior) - 2)),"Mean","Max")
 	}
 	else
 	{
@@ -223,12 +240,14 @@ summary.mutPPAs<-function(object,thresh=0.5,digits=2, ...)
 		hyp_id<-NA
 		entropy<-NA
 		shannon<-NA
+		klprior<-NA
 	}
 
 	#remove elements of x that are no longer necessary
 	x$sitesofinterest<-sitesofinterest
 	x$entropy<-entropy
 	x$shannon<-shannon
+	x$klprior<-klprior
 	x$hyp_output<-hyp_output
 	x$hyp_names<-hyp_names
 	x$hyp_id<-hyp_id
