@@ -688,23 +688,58 @@ extract_site_info<-function(object,site,criteria=c("less","stringent"),num_mod=5
 				ans1<-apply(s2,2,function(x,dists) entropy.fn(dists[,1],x),dists=dists)
 				entropy[j-1]<-entropy.fn(dists[,1],dists[,j])/max(ans1)
 			}
-			entropy<-round(entropy,digits=digits)
 			entropy<-c(entropy,mean(entropy),max(entropy))
+			entropy<-round(entropy,digits=digits)
 			entropy<-as.character(entropy)
 			entropy<-matrix(entropy,nrow=1)
 			entropy<-rbind(c(paste(2:(ncol(entropy)-1),":1",sep=""),"Mean","Max"),entropy)
-			cat("\nEntropy measures\n")
+			cat("\nK-L entropy measures\n")
 			entropy<-format(entropy,justify="centre")
 			write.table(entropy,quote=F,na="",row.names=F,col.names=F)
+			
+			#calculate shannon entropy
+			shannon <- apply(dists, 2, function(x)
+			{
+				dists <- matrix(x, nrow = 4)
+				#calculate normalised Shannon entropy
+				ans <- apply(dists, 2, shannon.fn)
+				ans <- ans / (-4 * 0.25 * log(0.25))
+				ans
+			})
+			shannon<-c(shannon,mean(shannon),max(shannon))
+			shannon<-round(shannon,digits=digits)
+			shannon<-as.character(shannon)
+			shannon<-matrix(shannon,nrow=1)
+			shannon<-rbind(c(paste(2:(ncol(shannon)-1),":1",sep=""),"Mean","Max"),shannon)
+			cat("\nShannon entropy measures\n")
+			shannon<-format(shannon,justify="centre")
+			write.table(shannon,quote=F,na="",row.names=F,col.names=F)
+			
+			#calculate K-L entropy relative to the prior
+			klprior <- apply(dists, 2, function(dists)
+			{
+				#produce normalised entropy
+				s <- sum(dists)
+				s <- s * diag(4)
+				ans1 <- apply(s, 2, klprior.fn)
+				ans <- klprior.fn(dists)/max(ans1)
+			})
+			klprior <- 1 - klprior
+			klprior<-c(klprior,mean(klprior),max(klprior))
+			klprior<-round(klprior,digits=digits)
+			klprior<-as.character(klprior)
+			klprior<-matrix(klprior,nrow=1)
+			klprior<-rbind(c(paste(2:(ncol(klprior)-1),":1",sep=""),"Mean","Max"),klprior)
+			cat("\nK-L entropy measures (relative to prior)\n")
+			klprior<-format(klprior,justify="centre")
+			write.table(klprior,quote=F,na="",row.names=F,col.names=F)
+			
 			#draw if required
 			if(draw==TRUE)
-			{
-				basecols<-c("red","blue","green","yellow")
-				basedistprop.draw<-apply(basedistprop.draw,2,rev)
-				basecols<-basecols[match(rownames(basedistprop.draw),c("A","C","G","T"))]
-				par(mar=c(3,4,3,3)+0.1,oma=c(0,0,0,2))
-				barplot(basedistprop.draw,col=basecols,ylab="Proportion of bases",main=paste("Site",site,"in",object$genes))
-				legend(par("usr")[2]*1.12,mean(par("usr")[3:4]),legend=c("A","C","G","T"),fill=c("red","blue","green","yellow"),xjust=1,xpd=T,yjust=0.5)
+			{			
+				basedistprop.draw <- data.frame(Base = factor(rep(rownames(basedistprop.draw), times = ncol(basedistprop.draw)), levels = c("A", "C", "G", "T")), Sample = factor(rep(colnames(basedistprop.draw), each = nrow(basedistprop.draw)), levels = colnames(basedistprop.draw)), Proportion = matrix(basedistprop.draw, ncol = 1))
+				temp.plot <- ggplot(data = basedistprop.draw, aes(Sample, Proportion, fill = Base)) + geom_bar(stat = "identity") + ggtitle(paste("Nucleotide site", site))
+				print(temp.plot)
 			}
 		}
 	}

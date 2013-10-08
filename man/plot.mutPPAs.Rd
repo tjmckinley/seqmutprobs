@@ -4,7 +4,9 @@
 association from call to \code{\link{seqtoPPAs}}}
 \usage{
   \method{plot}{mutPPAs} (x, thresh = 0.5, digits = 2,
-    prior = NULL, entropy = c("max", "mean"), ...)
+    prior = NULL, entropy = c("max", "mean"),
+    type = c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"),
+    ...)
 }
 \arguments{
   \item{x}{a \code{"mutPPAs"} object, usually as a result
@@ -23,6 +25,12 @@ association from call to \code{\link{seqtoPPAs}}}
   \item{entropy}{a character corresponding to whether to
   plot the "max" or "mean" of the absolute relative entropy
   values.}
+
+  \item{type}{a character vector denoting the type of plots
+  to output. Takes any of the values c("all", "ent_PPA",
+  "shannon_ent", "prior_ent", "temporal_ent"). If any of
+  the values is "all", then the other values will be
+  ignored.}
 
   \item{\dots}{not used.}
 }

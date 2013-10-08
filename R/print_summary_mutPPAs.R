@@ -160,7 +160,7 @@ print.summary.mutPPAs<-function(x, ...)
 			#now print K-L entropy (relative to the prior) results to the screen
 			cat("\n")
 			x$klprior<-rbind(colnames(x$klprior),x$klprior)
-			x$klprior<-rbind(c("K-L (prior) entropy",rep("",ncol(x$klprior)-1)),x$klprior)
+			x$klprior<-rbind(c("1 - K-L (prior) entropy",rep("",ncol(x$klprior)-1)),x$klprior)
 			x$klprior[is.na(x$klprior)]<-""
 			x$klprior<-cbind(x$sitesofinterest[,1],x$klprior)
 			write.table(format(x$klprior),quote=F,na="",row.names=F,col.names=F)

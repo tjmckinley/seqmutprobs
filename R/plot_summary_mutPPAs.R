@@ -18,6 +18,9 @@
 #' smallest prior PA.
 #' @param entropy a character corresponding to whether to plot the "max" or
 #' "mean" of the absolute relative entropy values.
+#' @param type a character vector denoting the type of plots to output. Takes any of the
+#' values c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"). If any of the
+#' values is "all", then the other values will be ignored.
 #' @param \dots not used.
 #' @author TJ McKinley
 #' @seealso \code{\link{seqtoPPAs}}, \code{\link{print.mutPPAs}},
@@ -52,7 +55,7 @@
 #' @method plot summary.mutPPAs
 #' @export plot.summary.mutPPAs
 
-plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), ...)
+plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"), ...)
 {
 	if(class(x)!="summary.mutPPAs") stop("'x' is not a 'summary.mutPPAs' object")
 	if(is.numeric(prior)==FALSE & is.null(prior)==FALSE) stop("'prior' argument is not a numeric scalar or NULL")
@@ -62,7 +65,10 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), ...)
 		prior<-prior[1]
 	}
 	if(entropy[1]!="max" & entropy[1]!="mean") stop("Wrong input for 'entropy' argument")
-	
+	if(!is.character(type)) stop("'type' argument is not a character vector")
+	matchtype <- match(type, c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"))
+	if(length(matchtype[is.na(matchtype)]) > 0) stop("Wrong input for 'type' argument")
+	if(length(which(type == "all")) > 0) type <- c("ent_PPA", "shannon_ent", "prior_ent", "temporal_ent")
 	
 	sites1<-x$sitesofinterest
 	nsites<-nrow(sites1)
@@ -87,97 +93,88 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), ...)
 		if(ncol(sites1)==1) stop("'prior' argument doesn't exist in 'x$sitesofinterest'")
 	}
 	colnames(sites1)[2:ncol(sites1)]<-x$hyp_names[x$hyp_names!=""]
-	#set up colours and point symbols
-	cols<-rainbow(n=nsites)
-	pchs<-rep(21:25,ceiling(nsites/5))
-	pchs<-pchs[1:nsites]
-	ymin<-unlist(sites1[,2:ncol(sites1)])
-	ymin<-ymin[!is.na(ymin)]
-	ymax<-max(ymin)
-	ymin<-min(ymin)
-	if(entropy[1]=="max") entcol<-ncol(x$entropy)
-	else entcol<-ncol(x$entropy)-1
-	xmin<-unlist(x$entropy[,entcol])
-	xmin<-xmin[!is.na(xmin)]
-	xmax<-max(xmin)
-	xmin<-min(xmin)
+	
 	#plot PPA versus entropy
 	
-	#calculate outer margin necessary for plot
-	ncol.legend<-ceiling(nsites/25)
-	
-	#open new graphics device and set parameters
-	if(dev.cur()==1) dev<-0
-	else
-	{
-		dev<-names(dev.cur())
-		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
-		else dev<-1
-	}
-	if(dev==0) dev.new(width=7*(ncol(sites1)-1)+0.5*ncol.legend,height=7)
-	par(mfrow=c(1,ncol(sites1)-1),oma=c(0,0,2,4*ncol.legend))
+	if(entropy[1] == "max") entcol <- ncol(x$entropy)
+    else entcol <- ncol(x$entropy) - 1
+    
+    #set up list of plot objects
+    plots.list <- list(NULL)
+    plots.ind <- 1
+
+	#generate data frame containing information to be plotted
 	for(j in 2:ncol(sites1))
 	{
-		cols1<-cols[!is.na(sites1[,j])]
-		pchs1<-pchs[!is.na(sites1[,j])]
-		entropy1<-x$entropy[!is.na(sites1[,j]),entcol]
-		sites2<-sites1[!is.na(sites1[,j]),]
-		if(!is.matrix(sites2)) sites2<-matrix(sites2,nrow=1)
-		plot(entropy1,sites2[,j],bg=cols1,pch=pchs1,ylab=paste("PPA (prior PA=",prior1,")",sep=""),xlab=paste(ifelse(entropy[1]=="max","Max.","Mean")," K-L entropy"),main=paste(colnames(sites2)[j]),ylim=c(ymin,ymax),xlim=c(xmin,xmax))
+		entropy1 <- x$entropy[!is.na(sites1[, j]), entcol]
+		sites2 <- sites1[!is.na(sites1[, j]), ]
+		if(!is.matrix(sites2)) sites2 <- matrix(sites2, nrow = 1)
+		if(j == 2) entropy.dat <- data.frame(sites = sites2[, 1], x = entropy1, y = sites2[, j], names = colnames(sites1)[j])
+		else entropy.dat <- rbind(entropy.dat, data.frame(sites = sites2[, 1], x = entropy1, y = sites2[, j], names = colnames(sites1)[j]))
 	}
-	legend(par("usr")[2]*1.05,mean(par("usr")[3:4]),legend=sites1[,1],pch=pchs,pt.bg=cols,xpd=NA,yjust=0.5,ncol=ncol.legend)
-	mtext(text=paste(x$genes),side=3,font=2,cex=1.5,outer=T)
+	entropy.dat$sites <- factor(entropy.dat$sites)
+	ent.levels <- levels(entropy.dat$sites)
+	ent.sites <- sites1[, 1]
+	
+	if(length(which(type == "ent_PPA")) > 0)
+	{
+		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, xlab = "K-L entropy (relative to first sample)", ylab = paste("PPA (prior PA=",prior1,")",sep="")) + facet_grid(names ~ .) + guides(col = guide_legend(ncol = ceiling(length(ent.levels)/7), title = "Sites"))
+		plots.ind <- plots.ind + 1
+	}
+	
+	#plot entropy vs Shannon entropy
+	#open new graphics device and set parameters
+#	if(dev.cur()==1) dev<-0
+#	else
+#	{
+#		dev<-names(dev.cur())
+#		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
+#		else dev<-1
+#	}
+#	if(dev==0) dev.new(width = 7, height = 7)
+	entropy.dat <- data.frame(sites = ent.sites, x = x$shannon[, entcol + 1], y = x$entropy[, entcol], names = colnames(sites1)[j])
+	entropy.dat$sites <- factor(entropy.dat$sites, levels = ent.levels)
+	
+	if(length(which(type == "shannon_ent")) > 0)
+	{
+		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, ylab = "K-L entropy (relative to first sample)", xlab = "Shannon entropy") + guides(col = guide_legend(ncol = ceiling(length(ent.levels)/7), title = "Sites"))
+		plots.ind <- plots.ind + 1
+	}
 	
 	#plot entropy vs Shannon entropy
 	
-	ymin<-unlist(x$entropy[,entcol])
-	ymax<-max(ymin)
-	ymin<-min(ymin)
-	xmin<-unlist(x$shannon[,entcol + 1])
-	xmax<-max(xmin)
-	xmin<-min(xmin)
-	
 	#open new graphics device and set parameters
-	if(dev.cur()==1) dev<-0
-	else
-	{
-		dev<-names(dev.cur())
-		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
-		else dev<-1
-	}
-	if(dev==0) dev.new(width=7+0.5*ncol.legend,height=7)
-	par(mfrow=c(1,1),oma=c(0,0,2,4*ncol.legend))
-	cols1<-cols
-	pchs1<-pchs
-	shannon1<-x$shannon[,entcol + 1]
-	entropy1<-x$entropy[,entcol]
-	plot(shannon1,entropy1,bg=cols1,pch=pchs1,ylab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"K-L entropy"),xlab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"Shannon entropy"),ylim=c(ymin,ymax),xlim=c(xmin,xmax))
-	legend(par("usr")[2]*1.05,mean(par("usr")[3:4]),legend=sites1[,1],pch=pchs,pt.bg=cols,xpd=NA,yjust=0.5,ncol=ncol.legend)
-	mtext(text=paste(x$genes),side=3,font=2,cex=1.5,outer=T)
+#	if(dev.cur()==1) dev<-0
+#	else
+#	{
+#		dev<-names(dev.cur())
+#		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
+#		else dev<-1
+#	}
+#	if(dev==0) dev.new(width = 7, height = 7)
+	entropy.dat <- data.frame(sites = ent.sites, x = x$klprior[, entcol + 1], y = x$entropy[, entcol], names = colnames(sites1)[j])
+	entropy.dat$sites <- factor(entropy.dat$sites, levels = ent.levels)
 	
-	#plot entropy vs K-L (vs. prior) entropy
-	ymin<-unlist(x$entropy[,entcol])
-	ymax<-max(ymin)
-	ymin<-min(ymin)
-	xmin<-unlist(x$klprior[,entcol + 1])
-	xmax<-max(xmin)
-	xmin<-min(xmin)
-	
-	#open new graphics device and set parameters
-	if(dev.cur()==1) dev<-0
-	else
+	if(length(which(type == "prior_ent")) > 0)
 	{
-		dev<-names(dev.cur())
-		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
-		else dev<-1
+		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, ylab = "K-L entropy (relative to first sample)", xlab = "1 - K-L entropy (relative to prior)") + guides(col = guide_legend(ncol = ceiling(length(ent.levels)/7), title = "Sites"))
+		plots.ind <- plots.ind + 1
 	}
-	if(dev==0) dev.new(width=7+0.5*ncol.legend,height=7)
-	par(mfrow=c(1,1),oma=c(0,0,2,4*ncol.legend))
-	cols1<-cols
-	pchs1<-pchs
-	klprior1<-x$klprior[,entcol + 1]
-	entropy1<-x$entropy[,entcol]
-	plot(klprior1,entropy1,bg=cols1,pch=pchs1,ylab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"K-L entropy"),xlab=paste(ifelse(entropy[1]=="max","Max.","Mean"),"K-L (against prior) entropy"),ylim=c(ymin,ymax),xlim=c(xmin,xmax))
-	legend(par("usr")[2]*1.05,mean(par("usr")[3:4]),legend=sites1[,1],pch=pchs,pt.bg=cols,xpd=NA,yjust=0.5,ncol=ncol.legend)
-	mtext(text=paste(x$genes),side=3,font=2,cex=1.5,outer=T)
+	
+	#plot entropy over time
+	if(length(which(type == "temporal_ent")) > 0)
+	{
+		entropy1 <- as.data.frame(x$entropy)
+		entropy1 <- entropy1[, 1:(ncol(entropy1) - 2), drop = FALSE]
+		entropy1 <- data.frame(entropy = unlist(entropy1), comparison = rep(colnames(entropy1), each = nrow(entropy1)))
+		entropy1 <- cbind(sites = rep(sites1[, 1], times = nrow(entropy1)/nrow(sites1)), entropy1)
+		entropy1$sites <- factor(as.character(entropy1$sites), levels = ent.levels)
+		if(nrow(entropy1) > 2)
+		{
+			plots.list[[plots.ind]] <- ggplot(entropy1, aes(comparison, entropy, group = sites, colour = sites)) + geom_line() + guides(col = guide_legend(ncol = ceiling(length(ent.levels)/7), title = "Sites")) + ylab("K-L entropy (relative to first sample)") + xlab("Samples (in order)")
+			plots.ind <- plots.ind + 1
+		}
+	}
+	
+	multiplot(plotlist = plots.list, cols = 2)
 }

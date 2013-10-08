@@ -2,19 +2,21 @@ Package: seqmutprobs
 Type: Package
 Title: Screens sequence data for single-nucleotide site mutations-of-interest
 Version: 1.0
-Date: 2012-03-06
+Date: 2013-10-08
 Author: TJ McKinley
 Maintainer: TJ McKinley <tjm44@cam.ac.uk>
 Description: This package compares sets of genetic sequences and screens for
     nucleotide sites-of-interest, based on the methods developed in McKinley et
-    al., PLoS Comp. Biol. (2011) and McKinley et al. (2012), in preparation.
+    al., PLoS Comp. Biol. (2011) and McKinley et al. (2013), in preparation.
 Depends:
     seqinr (<= 3.5-0),
     Rsamtools,
     Rmpfr,
-    multicore
+    multicore,
+    ggplot2,
+    grid
 SystemRequirements: samtools, Perl
-License: GPL-2
+License: GPL-3
 LazyLoad: yes
 Collate:
     'calc_basedist.R'
@@ -42,3 +44,4 @@ Collate:
     'summary_mutPPAs.R'
     'mutPPAs_full.R'
     'seqmutprobs-package.R'
+    'multiplot.R'

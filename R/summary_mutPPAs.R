@@ -213,8 +213,7 @@ summary.mutPPAs<-function(object,thresh=0.5,digits=2, ...)
 			ans <- ans / (-4 * 0.25 * log(0.25))
 			ans
 		})
-		if(nrow(dists)>8) shannon<-t(shannon)
-		else shannon<-matrix(shannon,ncol=1)
+		shannon<-t(shannon)
 		shannon<-cbind(shannon,apply(shannon,1,mean),apply(shannon,1,max))
 		shannon<-round(shannon,digits=digits)
 		colnames(shannon)<-c(as.character(1:(ncol(shannon) - 2)),"Mean","Max")
@@ -222,14 +221,19 @@ summary.mutPPAs<-function(object,thresh=0.5,digits=2, ...)
 		#calculate K-L entropy relative to the prior
 		klprior <- apply(dists, 2, function(x)
 		{
-			dists <- matrix(x, nrow = 4)
-			#calculate K-L entropy
-			ans <- apply(dists, 2, klprior.fn)
-			for(j in 1:length(ans)) ans[j] <- ans[j] / klprior.fn(c(0, 0, 0, sum(dists[, j])))
-			ans
+			dists<-matrix(x,nrow=4)
+			#calculate entropy
+			ans <- apply(dists, 2, function(dists)
+			{
+				#produce normalised entropy
+				s <- sum(dists)
+				s <- s * diag(4)
+				ans1 <- apply(s, 2, klprior.fn)
+				ans <- klprior.fn(dists)/max(ans1)
+			})
+			ans <- 1 - ans
 		})
-		if(nrow(dists)>8) klprior<-t(klprior)
-		else klprior<-matrix(klprior,ncol=1)
+		klprior<-t(klprior)
 		klprior<-cbind(klprior,apply(klprior,1,mean),apply(klprior,1,max))
 		klprior<-round(klprior,digits=digits)
 		colnames(klprior)<-c(as.character(1:(ncol(klprior) - 2)),"Mean","Max")

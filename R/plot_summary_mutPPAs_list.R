@@ -20,6 +20,9 @@
 #' smallest prior PA.
 #' @param entropy a character corresponding to whether to plot the "max" or
 #' "mean" of the absolute relative entropy values.
+#' @param type a character vector denoting the type of plots to output. Takes any of the
+#' values c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"). If any of the
+#' values is "all", then the other values will be ignored.
 #' @param \dots not used.
 #' @author TJ McKinley
 #' @seealso \code{\link{seqtoPPAs}}, \code{\link{extract_site_info}},
@@ -31,10 +34,22 @@
 #' @method plot summary.mutPPAs.list
 #' @export plot.summary.mutPPAs.list
 
-plot.summary.mutPPAs.list<-function(x,prior=NULL,entropy=c("max","mean"), ...)
+plot.summary.mutPPAs.list<-function(x,prior=NULL,entropy=c("max","mean"),type = c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"), ...)
 {
 	if(missing(x)) stop("'x' argument missing")
 	if(class(x)!="summary.mutPPAs.list") stop("'x' is not a 'summary.mutPPAs.list' object")
-	for(i in 1:length(x)) plot(x[[i]],prior=prior,entropy=entropy)
+	for(i in 1:length(x))
+	{
+		if(dev.cur()==1) dev<-0
+		else
+		{
+			dev<-names(dev.cur())
+			if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
+			else dev<-1
+		}
+		if(dev==0) dev.new(width = 7, height = 7)
+		
+		plot(x[[i]],prior=prior,entropy=entropy,type=type)
+	}
 }
 
