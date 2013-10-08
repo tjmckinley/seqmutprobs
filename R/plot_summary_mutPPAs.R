@@ -72,7 +72,16 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	
 	sites1<-x$sitesofinterest
 	nsites<-nrow(sites1)
-	if(nsites==0) stop("No sites-of-interest")
+	if(is.null(nsites))
+	{
+		cat("No sites-of-interest\n")
+		return(1)
+	}
+	if(nsites == 0)
+	{
+		cat("No sites-of-interest\n")
+		return(1)
+	}
 	if(is.null(prior))
 	{
 		#search for location of smallest prior
@@ -93,6 +102,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 		if(ncol(sites1)==1) stop("'prior' argument doesn't exist in 'x$sitesofinterest'")
 	}
 	colnames(sites1)[2:ncol(sites1)]<-x$hyp_names[x$hyp_names!=""]
+	colnames(sites1)[1] <- "sites"
 	
 	#plot PPA versus entropy
 	
@@ -123,16 +133,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	}
 	
 	#plot entropy vs Shannon entropy
-	#open new graphics device and set parameters
-#	if(dev.cur()==1) dev<-0
-#	else
-#	{
-#		dev<-names(dev.cur())
-#		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
-#		else dev<-1
-#	}
-#	if(dev==0) dev.new(width = 7, height = 7)
-	entropy.dat <- data.frame(sites = ent.sites, x = x$shannon[, entcol + 1], y = x$entropy[, entcol], names = colnames(sites1)[j])
+	entropy.dat <- data.frame(sites = ent.sites, x = x$shannon[, entcol + 1], y = x$entropy[, entcol])
 	entropy.dat$sites <- factor(entropy.dat$sites, levels = ent.levels)
 	
 	if(length(which(type == "shannon_ent")) > 0)
@@ -142,17 +143,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	}
 	
 	#plot entropy vs Shannon entropy
-	
-	#open new graphics device and set parameters
-#	if(dev.cur()==1) dev<-0
-#	else
-#	{
-#		dev<-names(dev.cur())
-#		if(length(grep("X11",dev))>0 | length(grep("quartz",dev))>0 | length(grep("windows",dev))>0) dev<-0
-#		else dev<-1
-#	}
-#	if(dev==0) dev.new(width = 7, height = 7)
-	entropy.dat <- data.frame(sites = ent.sites, x = x$klprior[, entcol + 1], y = x$entropy[, entcol], names = colnames(sites1)[j])
+	entropy.dat <- data.frame(sites = ent.sites, x = x$klprior[, entcol + 1], y = x$entropy[, entcol])
 	entropy.dat$sites <- factor(entropy.dat$sites, levels = ent.levels)
 	
 	if(length(which(type == "prior_ent")) > 0)
