@@ -16,6 +16,10 @@
 #' take the values c("kl", "shannon", "klprior").
 #' @param criteria character denoting which criteria to select sites-of-interest on. Can
 #' take the values c("less", stringent").
+#' @param coverage a logical indicating whether coverage is to be plotted or not.
+#' @param log_coverage a logical indicating whether coverage is to be plotted on the log-scale or not.
+#' @param nrow_legend a numeric indicating the maximum number of rows in the legend 
+#' (automatically updating the columns accordingly).
 #' @param \dots not used.
 #' @author TJ McKinley
 #' @references McKinley et al., PLoS Comp. Biol., 7 (3), e1002027, (2011). doi:
@@ -43,7 +47,7 @@
 #' 
 #' @export plot.fullentropy
 
-plot.fullentropy <- function(x, highlight_sites = TRUE, prior = NULL, entropy = c("max", "mean"), entropy_type = c("kl", "shannon", "klprior"), criteria = c("less", "stringent"), ...)
+plot.fullentropy <- function(x, highlight_sites = TRUE, prior = NULL, entropy = c("max", "mean"), entropy_type = c("kl", "shannon", "klprior"), criteria = c("less", "stringent"), coverage = TRUE, log_coverage = FALSE, ncol.legend = 7, ...)
 {
 	if(class(x)!="summary.mutPPAs") stop("'x' is not a 'summary.mutPPAs' object")
 	if(!is.logical(highlight_sites) | length(highlight_sites) > 1) stop("'highlight_sites' is not a logical value or it's a vector")
@@ -63,6 +67,15 @@ plot.fullentropy <- function(x, highlight_sites = TRUE, prior = NULL, entropy = 
 	if(length(criteria) > 1) criteria <- criteria[1]
 	matchtype <- match(criteria, c("less", "stringent"))
 	if(is.na(matchtype)) stop("'criteria' not recognised")
+	
+	if(length(coverage) > 1) coverage <- coverage[1]
+	if(!is.logical(coverage)) stop("'coverage' is not a logical value")
+	
+	if(length(log_coverage) > 1) log_coverage <- log_coverage[1]
+	if(!is.logical(log_coverage)) stop("'log_coverage' is not a logical value")
+	
+	if(length(ncol.legend) > 1) ncol.legend <- ncol.legend[1]
+	if(!is.numeric(ncol.legend)) stop("'ncol.legend' is not a number")
 	
 	if(highlight_sites == TRUE)
 	{
@@ -102,7 +115,7 @@ plot.fullentropy <- function(x, highlight_sites = TRUE, prior = NULL, entropy = 
 		if(criteria == "less") sites1 <- subset(sites1, select = c("sites", "Less stringent"))
 		else sites1 <- subset(sites1, select = c("sites", "Stringent"))
 		if(ncol(sites1) != 2) stop("Can't select on criterion for this sample")
-		colnames(sites1)[2] <- "entropy"
+		colnames(sites1)[2] <- "PPA"
 		sites1 <- as.data.frame(sites1)
 	}
 	
@@ -156,20 +169,111 @@ plot.fullentropy <- function(x, highlight_sites = TRUE, prior = NULL, entropy = 
 	}, ent_type = entropy_type, entropy = entropy)
 	
 	#now expand to whole gene segment
-	entropies <- data.frame(entropies = entropies[x$nucind], site = 1:x$nnuc)
+	xnucind <- x$nucind
+	xnucind[is.na(xnucind)] <- 1
+	entropies <- data.frame(entropies = entropies[xnucind], site = 1:x$nnuc)
+	entropies$entropies[is.na(x$nucind)] <- NA
+	
+	#generate correct labelling for y-axis
+	ylabel <- switch(entropy_type, kl = "K-L entropy (relative to first sample)", shannon = "Shannon entropy", klprior = "K-L entropy (relative to prior)")
+	ylabel <- ifelse(entropy == "max", paste("Max.", ylabel), paste("Mean", ylabel))
 	
 	if(highlight_sites == TRUE)
-	{
-		entropies$group <- rep("Unselected sites", nrow(entropies))
-		entropies$group[sites1$sites] <- "Site-of-interest"
-		entropies$group <- factor(entropies$group, levels = c("Site-of-interest", "Unselected sites"))
-		#plot entropies
-		temp.plot <- ggplot(entropies, aes(site, entropies, colour = group)) + geom_point() + xlab("Nucleotide position") + ylab("Entropy")
+	{ 
+		#save maximum entropy value to re-scale coverage if required
+		maxent <- max(na.omit(entropies$entropies))
+		
+		#remove sites-of-interest from original data
+		sites2 <- entropies[sites1$sites, ]
+		entropies <- entropies[-sites1$sites, ]
+		
+		#set up coverage if required
+		if(coverage == TRUE)
+		{
+			#calculate coverage for each sample
+			coverage <- apply(x$basedist, 2, function(x)
+			{
+				x <- matrix(x, nrow = 4)
+				x <- apply(x, 2, sum)
+				x
+			})
+			maxcov <- max(coverage)
+			if(log_coverage == TRUE) coverage <- log(coverage)
+			#rescale to match entropy scale
+			coverage <- maxent * (coverage / ifelse(log_coverage == TRUE, log(maxcov), maxcov))
+			#expand to full segment
+			coverage <- coverage[, xnucind]
+			coverage[, is.na(x$nucind)] <- rep(NA, nrow(coverage))
+			#collapse to data frame (calling coverage column 'entropies' for ease-of-plotting)
+			coverage <- data.frame(entropies = matrix(t(coverage), ncol = 1), site = rep(1:x$nnuc, times = nrow(coverage)), sample = rep(1:nrow(coverage), each = x$nnuc))
+			coverage$sample <- factor(coverage$sample)
+			
+			#remove missing values
+			entropies <- na.omit(entropies)
+			
+			#set up plot with coverage layered in the background
+			temp.plot <- ggplot(coverage, colour = "grey") + geom_ribbon(aes(x = site, ymax = entropies, group = sample), ymin = 0, alpha = 0.25) + xlab("Nucleotide position") + ylab(ylabel)
+			#add sites
+			temp.plot <- temp.plot + geom_point(aes(site, entropies), data = entropies, colour = "grey")
+			#add sites-of-interest
+			temp.plot <- temp.plot + geom_point(aes(site, entropies, fill = factor(site)), data = sites2, pch = 21) + guides(col = guide_legend(ncol = ceiling(nrow(sites2) / ncol.legend))) + labs(colour = "Site")
+			
+			#add annotation mapping maximum coverage
+			temp.plot <- temp.plot + geom_text(aes(x, y, label = caption), data = data.frame(x = x$nnuc * 0.9, y = maxent, caption = ifelse(log_coverage == TRUE, paste0("Max. coverage\nlog(", maxcov,") = ", round(log(maxcov), digits = 2)), paste0("Max coverage\n", maxcov))), hjust = 0.5, vjust = 1, size = 4)
+		}
+		else
+		{
+			#remove missing values
+			entropies <- na.omit(entropies)
+			#plot entropies
+			temp.plot <- ggplot(entropies, aes(site, entropies), colour = "grey") + geom_point() + xlab("Nucleotide position") + ylab(ylabel)
+			#add sites-of-interest
+			temp.plot <- temp.plot + geom_point(aes(fill = factor(site)), data = sites2, pch = 21) + guides(col = guide_legend(ncol = ceiling(nrow(sites2) / ncol.legend))) + labs(colour = "Site")
+		}
 	}
 	else
 	{
-		#plot entropies
-		temp.plot <- ggplot(entropies, aes(site, entropies, colour = entropies)) + geom_point() + xlab("Nucleotide position") + ylab("Entropy")
+		#set up coverage if required
+		if(coverage == TRUE)
+		{
+			#save maximum entropy value to re-scale coverage if required
+			maxent <- max(na.omit(entropies$entropies))
+			
+			#calculate coverage for each sample
+			coverage <- apply(x$basedist, 2, function(x)
+			{
+				x <- matrix(x, nrow = 4)
+				x <- apply(x, 2, sum)
+				x
+			})
+			maxcov <- max(coverage)
+			if(log_coverage == TRUE) coverage <- log(coverage)
+			#rescale to match entropy scale
+			coverage <- maxent * (coverage / ifelse(log_coverage == TRUE, log(maxcov), maxcov))
+			#expand to full segment
+			coverage <- coverage[, xnucind]
+			coverage[, is.na(x$nucind)] <- rep(NA, nrow(coverage))
+			#collapse to data frame (calling coverage column 'entropies' for ease-of-plotting)
+			coverage <- data.frame(entropies = matrix(t(coverage), ncol = 1), site = rep(1:x$nnuc, times = nrow(coverage)), sample = rep(1:nrow(coverage), each = x$nnuc))
+			coverage$sample <- factor(coverage$sample)
+						
+			#remove missing values
+			entropies <- na.omit(entropies)
+			
+			#set up plot with coverage layered in the background
+			temp.plot <- ggplot(coverage, colour = "grey") + geom_ribbon(aes(x = site, ymax = entropies, group = sample), ymin = 0, alpha = 0.25) + xlab("Nucleotide position") + ylab(ylabel)
+			#add sites
+			temp.plot <- temp.plot + geom_point(aes(site, entropies, colour = entropies), data = entropies)
+			#add annotation mapping maximum coverage
+			temp.plot <- temp.plot + geom_text(aes(x, y, label = caption), data = data.frame(x = x$nnuc * 0.9, y = maxent, caption = ifelse(log_coverage == TRUE, paste0("Max. coverage\nlog(", maxcov,") = ", round(log(maxcov), digits = 2)), paste0("Max coverage\n", maxcov))), hjust = 0.5, vjust = 1, size = 4)
+		}
+		else
+		{
+			#remove missing values
+			entropies <- na.omit(entropies)
+			#plot entropies
+			temp.plot <- ggplot(entropies, aes(site, entropies, colour = entropies)) + geom_point() + xlab("Nucleotide position") + ylab(ylabel)
+		}
 	}
 	print(temp.plot)
 	print("NEED TO CHECK K-L PRIOR IS CORRECT WAY ROUND")
