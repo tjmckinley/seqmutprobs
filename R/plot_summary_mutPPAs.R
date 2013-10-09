@@ -21,7 +21,7 @@
 #' @param type a character vector denoting the type of plots to output. Takes any of the
 #' values c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"). If any of the
 #' values is "all", then the other values will be ignored.
-#' @param nrow.legend a numeric indicating the maximum number of rows in the legend 
+#' @param nrow_legend a numeric indicating the maximum number of rows in the legend 
 #' (automatically updating the columns accordingly).
 #' @param \dots not used.
 #' @author TJ McKinley
@@ -57,7 +57,7 @@
 #' @method plot summary.mutPPAs
 #' @export plot.summary.mutPPAs
 
-plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"), ncol.legend = 7, ...)
+plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"), nrow_legend = 7, ...)
 {
 	if(class(x)!="summary.mutPPAs") stop("'x' is not a 'summary.mutPPAs' object")
 	if(is.numeric(prior)==FALSE & is.null(prior)==FALSE) stop("'prior' argument is not a numeric scalar or NULL")
@@ -72,8 +72,8 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	if(length(matchtype[is.na(matchtype)]) > 0) stop("Wrong input for 'type' argument")
 	if(length(which(type == "all")) > 0) type <- c("ent_PPA", "shannon_ent", "prior_ent", "temporal_ent")
 	
-	if(length(ncol.legend) > 1) ncol.legend <- ncol.legend[1]
-	if(!is.numeric(ncol.legend)) stop("'ncol.legend' is not a number")
+	if(length(nrow_legend) > 1) nrow_legend <- nrow_legend[1]
+	if(!is.numeric(nrow_legend)) stop("'nrow_legend' is not a number")
 	
 	sites1<-x$sitesofinterest
 	nsites<-nrow(sites1)
@@ -133,7 +133,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	
 	if(length(which(type == "ent_PPA")) > 0)
 	{
-		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, xlab = "K-L entropy (relative to first sample)", ylab = paste("PPA (prior PA=",prior1,")",sep="")) + facet_grid(names ~ .) + guides(col = guide_legend(ncol = ceiling(length(ent.levels) / ncol.legend), title = "Sites"))
+		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, xlab = "K-L entropy (relative to first sample)", ylab = paste("PPA (prior PA=",prior1,")",sep="")) + facet_grid(names ~ .) + guides(col = guide_legend(ncol = ceiling(length(ent.levels) / nrow_legend), title = "Sites"))
 		plots.ind <- plots.ind + 1
 	}
 	
@@ -143,7 +143,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	
 	if(length(which(type == "shannon_ent")) > 0)
 	{
-		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, ylab = "K-L entropy (relative to first sample)", xlab = "Shannon entropy") + guides(col = guide_legend(ncol = ceiling(length(ent.levels) / ncol.legend), title = "Sites"))
+		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, ylab = "K-L entropy (relative to first sample)", xlab = "Shannon entropy") + guides(col = guide_legend(ncol = ceiling(length(ent.levels) / nrow_legend), title = "Sites"))
 		plots.ind <- plots.ind + 1
 	}
 	
@@ -153,7 +153,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 	
 	if(length(which(type == "prior_ent")) > 0)
 	{
-		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, ylab = "K-L entropy (relative to first sample)", xlab = "1 - K-L entropy (relative to prior)") + guides(col = guide_legend(ncol = ceiling(length(ent.levels) / ncol.legend), title = "Sites"))
+		plots.list[[plots.ind]] <- qplot(x, y, data = entropy.dat, geom = "point", colour = sites, ylab = "K-L entropy (relative to first sample)", xlab = "1 - K-L entropy (relative to prior)") + guides(col = guide_legend(ncol = ceiling(length(ent.levels) / nrow_legend), title = "Sites"))
 		plots.ind <- plots.ind + 1
 	}
 	
@@ -167,7 +167,7 @@ plot.summary.mutPPAs<-function(x, prior=NULL, entropy=c("max","mean"), type = c(
 		entropy1$sites <- factor(as.character(entropy1$sites), levels = ent.levels)
 		if(nrow(entropy1) > 2)
 		{
-			plots.list[[plots.ind]] <- ggplot(entropy1, aes(comparison, entropy, group = sites, colour = sites)) + geom_line() + guides(col = guide_legend(ncol = ceiling(length(ent.levels) /ncol.legend), title = "Sites")) + ylab("K-L entropy (relative to first sample)") + xlab("Samples (in order)")
+			plots.list[[plots.ind]] <- ggplot(entropy1, aes(comparison, entropy, group = sites, colour = sites)) + geom_line() + guides(col = guide_legend(ncol = ceiling(length(ent.levels) /nrow_legend), title = "Sites")) + ylab("K-L entropy (relative to first sample)") + xlab("Samples (in order)")
 			plots.ind <- plots.ind + 1
 		}
 	}
