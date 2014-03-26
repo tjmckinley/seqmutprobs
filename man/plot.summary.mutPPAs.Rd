@@ -6,7 +6,7 @@ sites-of-interest obtained from call to \code{\link{summary.mutPPAs}}}
   \method{plot}{summary.mutPPAs} (x, prior = NULL,
     entropy = c("max", "mean"),
     type = c("all", "ent_PPA", "shannon_ent", "prior_ent", "temporal_ent"),
-    ...)
+    nrow_legend = 7, ...)
 }
 \arguments{
   \item{x}{a \code{"summary.mutPPAs"} object.}
@@ -24,6 +24,10 @@ sites-of-interest obtained from call to \code{\link{summary.mutPPAs}}}
   "shannon_ent", "prior_ent", "temporal_ent"). If any of
   the values is "all", then the other values will be
   ignored.}
+
+  \item{nrow_legend}{a numeric indicating the maximum
+  number of rows in the legend (automatically updating the
+  columns accordingly).}
 
   \item{\dots}{not used.}
 }
