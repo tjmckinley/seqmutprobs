@@ -1,16 +1,16 @@
-#print method for "mutPPAs.list" objects
+# print method for 'mutPPAs.list' objects
 
 
 #' Prints summaries of sequence information and posterior probabilities of
 #' association from call to \code{\link{seqtoPPAs}}
 #' 
-#' \code{print} method for class \code{"mutPPAs.list"}
+#' \code{print} method for class \code{'mutPPAs.list'}
 #' 
 #' Function prints some summary statistics to the screen. Acts as a wrapper
 #' function for \code{summary.mutPPAs.list} and
 #' \code{print.summary.mutPPAs.list}.
 #' 
-#' @param x a \code{"mutPPAs.list"} object, usually as a result of a call to
+#' @param x a \code{'mutPPAs.list'} object, usually as a result of a call to
 #' \code{\link{seqtoPPAs}}.
 #' @param thresh a numerical value between 0 and 1 such that all sites with
 #' PPA>thresh are returned.
@@ -32,11 +32,13 @@
 #' @method print mutPPAs.list
 #' @export print.mutPPAs.list
 
-print.mutPPAs.list<-function(x,thresh=0.5,digits=2, ...)
-{
-	if(missing(x)) stop("'x' argument missing")
-	if(class(x)!="mutPPAs.list") stop("'x' is not a 'mutPPAs.list' object")
-	sapply(x,function(x) if(class(x)!="mutPPAs") stop("Elements of 'x' are not 'mutPPAs' objects"))
-	print(summary(x,thresh=thresh,digits=digits, ...))
+print.mutPPAs.list <- function(x, thresh = 0.5, digits = 2, ...) {
+    if (missing(x)) 
+        stop("'x' argument missing")
+    if (class(x) != "mutPPAs.list") 
+        stop("'x' is not a 'mutPPAs.list' object")
+    sapply(x, function(x) if (class(x) != "mutPPAs") 
+        stop("Elements of 'x' are not 'mutPPAs' objects"))
+    print(summary(x, thresh = thresh, digits = digits, ...))
 }
-
+ 

@@ -1,15 +1,15 @@
-#print method for "summary.mutPPAs.list" objects
+# print method for 'summary.mutPPAs.list' objects
 
 
 #' Prints summaries of sequence information and posterior probabilities of
 #' association from call to \code{\link{seqtoPPAs}}
 #' 
-#' \code{print} method for class \code{"summary.mutPPAs.list"}
+#' \code{print} method for class \code{'summary.mutPPAs.list'}
 #' 
-#' Function prints some summary statistics for \code{"summary.mutPPAs.list"} to
+#' Function prints some summary statistics for \code{'summary.mutPPAs.list'} to
 #' the screen.
 #' 
-#' @param x a \code{"summary.mutPPAs.list"} object.
+#' @param x a \code{'summary.mutPPAs.list'} object.
 #' @param \dots not used.
 #' @return Prints the number of sequences in each sample, the locations of
 #' nucleotides that have been removed from the analysis, and the number of
@@ -27,10 +27,11 @@
 #' @method print summary.mutPPAs.list
 #' @export print.summary.mutPPAs.list
 
-print.summary.mutPPAs.list<-function(x, ...)
-{
-	if(missing(x)) stop("'x' argument missing")
-	if(class(x)!="summary.mutPPAs.list") stop("'x' is not a 'summary.mutPPAs.list' object")
-	for(i in 1:length(x)) print(x[[i]])
+print.summary.mutPPAs.list <- function(x, ...) {
+    if (missing(x)) 
+        stop("'x' argument missing")
+    if (class(x) != "summary.mutPPAs.list") 
+        stop("'x' is not a 'summary.mutPPAs.list' object")
+    for (i in 1:length(x)) print(x[[i]])
 }
-
+ 

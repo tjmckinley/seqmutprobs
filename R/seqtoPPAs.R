@@ -1,4 +1,4 @@
-#create a generic function and default method for producing PPAs
+# create a generic function and default method for producing PPAs
 
 #' Produces PPAs from sequence data
 #' 
@@ -10,11 +10,11 @@
 #' of alignments from a given sample. These must be in the correct order for
 #' comparison (i.e. the initial sample must be first and so on). It is assumed
 #' that all sequences that will be entered will have been aligned to the same
-#' reference file. If \code{estimate="full"} then the PPAs are calculated based
+#' reference file. If \code{estimate='full'} then the PPAs are calculated based
 #' on every possible model. The memory requirements grow very quickly as the
 #' number of samples and/or the number of unique sequence sets grow (the latter
 #' in particular is an issue for long sequences produced by NGS methods)---see
-#' McKinley et al. (2012) for more details. If \code{estimate="top"}, then the
+#' McKinley et al. (2012) for more details. If \code{estimate='top'}, then the
 #' PPAs are evaluated based only on a subset of the `top' models. This uses an
 #' efficient search algorithm defined in McKinley et al. (2012) to select for
 #' all models with PPAs where the ratio of the candidate model to the `best'
@@ -36,7 +36,7 @@
 #' value in \code{nswitch_to_supp_output}, then the function automatically
 #' suppresses the return of all of the individual model outputs. This is to
 #' protect against excess memory usage for certain situations where even the
-#' \code{"top"} routine can produce very large large numbers of models (i.e.
+#' \code{'top'} routine can produce very large large numbers of models (i.e.
 #' for sites where there are little or no mutations).
 #' 
 #' Due to the heterogenous coverage present in NGS data, the \code{cov_thresh}
@@ -49,7 +49,7 @@
 #' Different prior probabilities of association can be specified in the
 #' \code{priorPA} argument, and it is also possible to screen for a subset of
 #' pre-defined sites using the \code{sites} argument. The function outputs a
-#' \code{"mutPPAs"} or \code{"mutPPAs.list"} object which have generic
+#' \code{'mutPPAs'} or \code{'mutPPAs.list'} object which have generic
 #' \code{'print'} and \code{'summary'} functions (and the former is also
 #' subsettable).
 #' 
@@ -58,26 +58,26 @@
 #' order starting with set of sequences for the initial biological sample.
 #' @param ref_file a character containing the path to a file containing the
 #' reference sequence(s). For NGS data this file must contain the same number
-#' of genes as are listed in the ".bam" file for the initial biological sample,
+#' of genes as are listed in the '.bam' file for the initial biological sample,
 #' and in the same order.
 #' @param format a character specifying the format for each input file. Must be
-#' one of "fasta", "clustal", "phylip", "mase", "msf", "bam" or "pileup", and
+#' one of 'fasta', 'clustal', 'phylip', 'mase', 'msf', 'bam' or 'pileup', and
 #' all input files must be in the same format.
 #' @param ref_format a character specifying the format for the reference file.
-#' Must be one of "fasta", "clustal", "phylip", "mase" or "msf", although if
-#' input files are in "bam" format then \code{ref_format} must be a "fasta"
+#' Must be one of 'fasta', 'clustal', 'phylip', 'mase' or 'msf', although if
+#' input files are in 'bam' format then \code{ref_format} must be a 'fasta'
 #' file.
 #' @param estimate a character specifying whether the full or top model sets
 #' are required.
 #' @param criteria a character specifying whether the less stringent or
-#' stringent criteria (see \code{"Details"}), or both, are to be used for
+#' stringent criteria (see \code{'Details'}), or both, are to be used for
 #' screening.
 #' @param supp_output a logical denoting whether to suppress the return of the
 #' individual model outputs.
 #' @param priorPA a numeric vector containing prior probabilities of
 #' association.
 #' @param c a scalar quantity specifying how the `top' model sets are selected
-#' (see \code{"Details"}).
+#' (see \code{'Details'}).
 #' @param samp_names a character vector containing the names of each of the
 #' samples in \code{seqdata}. If \code{NULL} then it is generated from the
 #' samples in \code{seqdata}
@@ -126,7 +126,7 @@
 #' subset of sites tested (if missing then all sites tested).}
 #' \item{priorPA:}{ a numeric vector corresponding to the prior
 #' probabilities of association.}
-#' \item{PPAs:}{ a list of length 5. If \code{output="full"} then the
+#' \item{PPAs:}{ a list of length 5. If \code{output='full'} then the
 #' element \code{models_num} is a single matrix, and \code{hyps} is a list of
 #' length 2, where each element corresponds to a screening criteria. Otherwise
 #' each element described below (with the exception of \code{nprior}) is a
@@ -154,7 +154,7 @@
 #' \code{models_num}.}
 #' \item{norms:}{ the top-level elements are scalars corresponding
 #' to the normalising constants for each set of PPAs. (These are missing when
-#' \code{estimate="approx"}.)}
+#' \code{estimate='approx'}.)}
 #' }
 #' \item{genes:}{ a vector of characters recording the names of the genes.}
 #' \item{estimate:}{ a character recording the type of estimate produced.}
@@ -175,15 +175,15 @@
 #' @examples
 #' 
 #' ##read in data from fasta files
-#' stock <- system.file("extdata/stock.fasta",
-#' package = "seqmutprobs")
-#' R01093seqW2 <- system.file("extdata/R01093seqW2.fasta",
-#' package = "seqmutprobs")
-#' R01093seqW4 <- system.file("extdata/R01093seqW4.fasta",
-#' package = "seqmutprobs")
+#' stock <- system.file('extdata/stock.fasta',
+#' package = 'seqmutprobs')
+#' R01093seqW2 <- system.file('extdata/R01093seqW2.fasta',
+#' package = 'seqmutprobs')
+#' R01093seqW4 <- system.file('extdata/R01093seqW4.fasta',
+#' package = 'seqmutprobs')
 #' 
-#' ref <- system.file("extdata/reference.fasta",
-#' package = "seqmutprobs")
+#' ref <- system.file('extdata/reference.fasta',
+#' package = 'seqmutprobs')
 #' 
 #' ##combine into ordered list of 'alignment' objects
 #' hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2, 
@@ -201,12 +201,12 @@
 #' 
 #' ##screen for sites-of-interest based on evaluating all possible models
 #' ##and suppressing the return of model outputs for individual sites
-#' hiv_muts <- seqtoPPAs(hiv_filenames, ref, estimate = "full")
+#' hiv_muts <- seqtoPPAs(hiv_filenames, ref, estimate = 'full')
 #' hiv_muts
 #' 
 #' ##screen for sites-of-interest based on evaluating all possible models
 #' ##and returning model outputs for individual sites for quicker post-processing
-#' hiv_muts <- seqtoPPAs(hiv_filenames, ref, estimate = "full", supp_output = FALSE)
+#' hiv_muts <- seqtoPPAs(hiv_filenames, ref, estimate = 'full', supp_output = FALSE)
 #' hiv_muts
 #' 
 #' ##subset ouput by a given site
@@ -215,5 +215,10 @@
 #' @export seqtoPPAs
 #' @useDynLib seqmutprobs
 
-seqtoPPAs<-function(filenames,ref_file,format=c("fasta","clustal","phylip","mase","msf","bam","pileup"),ref_format=c("fasta","clustal","phylip","mase","msf"),estimate=c("top","full"),criteria=c("both","stringent","less"),supp_output=TRUE,priorPA=c(0.001,0.01,0.05),c=20,samp_names=NULL,pstar=NULL,sites=NA,genes=NA,cov_thresh=5,nswitch_to_supp_output=5, mc.cores=1, ...) UseMethod("seqtoPPAs")
-
+seqtoPPAs <- function(filenames, ref_file, format = c("fasta", "clustal", "phylip", 
+    "mase", "msf", "bam", "pileup"), ref_format = c("fasta", "clustal", "phylip", 
+    "mase", "msf"), estimate = c("top", "full"), criteria = c("both", "stringent", 
+    "less"), supp_output = TRUE, priorPA = c(0.001, 0.01, 0.05), c = 20, samp_names = NULL, 
+    pstar = NULL, sites = NA, genes = NA, cov_thresh = 5, nswitch_to_supp_output = 5, 
+    mc.cores = 1, ...) UseMethod("seqtoPPAs")
+ 

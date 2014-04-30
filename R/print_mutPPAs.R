@@ -1,15 +1,15 @@
-#print method for "mutPPAs" objects
+# print method for 'mutPPAs' objects
 
 
 #' Prints summaries of sequence information and posterior probabilities of
 #' association from call to \code{\link{seqtoPPAs}}
 #' 
-#' \code{print} method for class \code{"mutPPAs"}
+#' \code{print} method for class \code{'mutPPAs'}
 #' 
 #' Function prints some summary statistics to the screen. Acts as a wrapper
 #' function for \code{summary.mutPPAs} and \code{print.summary.mutPPAs}.
 #' 
-#' @param x a \code{"mutPPAs"} object, usually as a result of a call to
+#' @param x a \code{'mutPPAs'} object, usually as a result of a call to
 #' \code{\link{seqtoPPAs}}.
 #' @param thresh a numerical value between 0 and 1 such that all sites with
 #' PPA>thresh are returned.
@@ -30,15 +30,15 @@
 #' @examples
 #' 
 #' ##read in data from fasta files
-#' stock <- system.file("extdata/stock.fasta",
-#' package = "seqmutprobs")
-#' R01093seqW2 <- system.file("extdata/R01093seqW2.fasta",
-#' package = "seqmutprobs")
-#' R01093seqW4 <- system.file("extdata/R01093seqW4.fasta",
-#' package = "seqmutprobs")
+#' stock <- system.file('extdata/stock.fasta',
+#' package = 'seqmutprobs')
+#' R01093seqW2 <- system.file('extdata/R01093seqW2.fasta',
+#' package = 'seqmutprobs')
+#' R01093seqW4 <- system.file('extdata/R01093seqW4.fasta',
+#' package = 'seqmutprobs')
 #' 
-#' ref <- system.file("extdata/reference.fasta",
-#' package = "seqmutprobs")
+#' ref <- system.file('extdata/reference.fasta',
+#' package = 'seqmutprobs')
 #' 
 #' ##combine into ordered list of 'alignment' objects
 #' hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2, 
@@ -52,10 +52,11 @@
 #' @method print mutPPAs
 #' @export print.mutPPAs
 
-print.mutPPAs<-function(x,thresh=0.5,digits=2, ...)
-{
-	if(missing(x)) stop("'x' argument missing")
-	if(class(x)!="mutPPAs") stop("'x' is not a 'mutPPAs' object")
-	print(summary.mutPPAs(x,thresh=thresh,digits=digits, ...))
+print.mutPPAs <- function(x, thresh = 0.5, digits = 2, ...) {
+    if (missing(x)) 
+        stop("'x' argument missing")
+    if (class(x) != "mutPPAs") 
+        stop("'x' is not a 'mutPPAs' object")
+    print(summary.mutPPAs(x, thresh = thresh, digits = digits, ...))
 }
-
+ 

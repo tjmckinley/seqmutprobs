@@ -32,15 +32,15 @@
 #' @examples
 #' 
 #' ##read in data from fasta files
-#' stock <- system.file("extdata/stock.fasta",
-#' package = "seqmutprobs")
-#' R01093seqW2 <- system.file("extdata/R01093seqW2.fasta",
-#' package = "seqmutprobs")
-#' R01093seqW4 <- system.file("extdata/R01093seqW4.fasta",
-#' package = "seqmutprobs")
+#' stock <- system.file('extdata/stock.fasta',
+#' package = 'seqmutprobs')
+#' R01093seqW2 <- system.file('extdata/R01093seqW2.fasta',
+#' package = 'seqmutprobs')
+#' R01093seqW4 <- system.file('extdata/R01093seqW4.fasta',
+#' package = 'seqmutprobs')
 #' 
-#' ref <- system.file("extdata/reference.fasta",
-#' package = "seqmutprobs")
+#' ref <- system.file('extdata/reference.fasta',
+#' package = 'seqmutprobs')
 #' 
 #' ##combine into ordered list of 'alignment' objects
 #' hiv_filenames <- list(stock = stock, R01093seqW2 = R01093seqW2, 
@@ -53,7 +53,7 @@
 #' 
 #' ##extract base distributions and top 5 models at site 945, for both
 #' ##stringent and less stringent screening criteria
-#' extract_site_info(hiv_muts, 945, "less")
-#' extract_site_info(hiv_muts, 945, "stringent")
+#' extract_site_info(hiv_muts, 945, 'less')
+#' extract_site_info(hiv_muts, 945, 'stringent')
 #' 
-NULL
+NULL 
